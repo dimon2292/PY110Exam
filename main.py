@@ -1,7 +1,9 @@
 import random
 import json
+import re
 from faker import Faker
 from conf import MODEL
+from regular_expression import REGEX
 
 fake = Faker()
 
@@ -33,7 +35,22 @@ def get_pages() -> int:
     pages = random.randint(100, 500)
     return pages
 
+def validate_isbn13(func):
+    """
+    декоратор, проверяющий правильность структуры значения ISBN13, генерируемого модулем Faker
+    :param func: функция генерирующая isbn13
+    :return: соотвествие регулярному выражению
+    """
+    def wrapper(*args, **kwargs):
+        result = func()
+        if re.fullmatch(REGEX, result):
+            return result
+        else:
+            raise ValueError('ISBN неверный')
+    return wrapper
 
+
+@validate_isbn13
 def get_isbn() -> str:
     """
     международный стандартный книжный номер
