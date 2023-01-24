@@ -8,6 +8,22 @@ from regular_expression import REGEX
 fake = Faker()
 
 
+
+def validation_length_of_title(func):
+    """
+    декоратор, проверяющий максимальную длину книги (например 100).
+    :param func: функция get_title
+    :return:
+    """
+    def wrapper(*args, **kwargs):
+        result = func()
+        if len(result) > 100:
+            raise ValueError("Превышена макcимальная длина заглавия")
+        return result
+    return wrapper
+
+
+@validation_length_of_title
 def get_title() -> str:
     """
     название книги
