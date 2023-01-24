@@ -5,31 +5,49 @@ from faker import Faker
 from conf import MODEL
 from regular_expression import REGEX
 
+
 fake = Faker()
 
 
-
-def validation_length_of_title(func):
+def max_len_title() -> int:
     """
-    декоратор, проверяющий максимальную длину книги (например 100).
-    :param func: функция get_title
+    вычисляет максимальную длину книги для декоратора fabric_decoration
+    :return: натуральное число
+    """
+    with open("books.txt", 'r', encoding='utf8') as f:
+        list_ = f.readlines()
+        return len(max(list_, key= len))
+
+
+def fabric_decoration(fn):
+    """
+    фабрика декоратора чтобы принимать максимальную длину книги как параметр для декоратора
+    :param fn: функция max_len_title
     :return:
     """
-    def wrapper(*args, **kwargs):
-        result = func()
-        if len(result) > 100:
-            raise ValueError("Превышена макcимальная длина заглавия")
-        return result
-    return wrapper
+    max_len = fn()                                           # максимальная длина книги
+    def validation_length_of_title(func):
+        """
+        декоратор, проверяющий чтобы не была превышена максимальную длину книги .
+        :param func: функция get_title
+        :return:
+        """
+        def wrapper(*args, **kwargs):
+            result = func()
+            if len(result) > max_len:
+                raise ValueError("Превышена макcимальная длина заглавия")
+            return result
+        return wrapper
+    return validation_length_of_title
 
 
-@validation_length_of_title
+@fabric_decoration(max_len_title)
 def get_title() -> str:
     """
     название книги
     :return: случайная строка из файла books.txt
     """
-    with open('books.txt', 'r', encoding= 'utf8') as f:
+    with open('books.txt', 'r', encoding='utf8') as f:
         titles = f.readlines()
     return random.choice(titles)
 
