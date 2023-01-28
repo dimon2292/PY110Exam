@@ -49,7 +49,7 @@ def get_title() -> str:
     """
     with open('books.txt', 'r', encoding='utf8') as f:
         titles = f.readlines()
-    return random.choice(titles)
+    return str.strip(random.choice(titles))
 
 
 def get_year() -> int:
